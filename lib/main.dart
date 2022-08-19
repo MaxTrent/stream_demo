@@ -43,8 +43,13 @@ class _StreamHomePageState extends State<StreamHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Stream'),
+      ),
+      body: Container(
+        decoration: BoxDecoration(color: bgColor),
+      ),
     );
   }
 
