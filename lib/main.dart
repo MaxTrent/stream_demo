@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:stream_demo/stream.dart';
+import 'dart:async';
+import 'dart:math';
+
 
 void main() {
   runApp(const MyApp());
@@ -31,13 +34,22 @@ class StreamHomePage extends StatefulWidget {
 }
 
 class _StreamHomePageState extends State<StreamHomePage> {
+  int? lastNumber;
+  NumberStream? numberStream;
+  StreamController? numberStreamController;
   Color? bgColor;
   ColorStream? colorStream;
 
   @override
   void initState(){
-    colorStream = ColorStream();
-    changeColor();
+    numberStream = NumberStream();
+    numberStreamController = numberStream!.controller;
+    Stream stream = numberStreamController!.stream;
+    stream.listen((event) {
+      setState(() {
+        lastNumber = event;
+      });
+    });
     super.initState();
   }
 
@@ -54,10 +66,10 @@ class _StreamHomePageState extends State<StreamHomePage> {
   }
 
   changeColor() async{
-    await for(var eventColor in colorStream!.getColor()){
+    colorStream!.getColor().listen((eventColor) {
       setState(() {
         bgColor = eventColor;
       });
-    }
+    });
   }
 }
