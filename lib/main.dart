@@ -59,7 +59,7 @@ class _StreamHomePageState extends State<StreamHomePage> {
         sink.close();
       }
     );
-    stream.listen((event) {
+    stream.transform(transformer!).listen((event) {
       setState(() {
         lastNumber = event;
       });
