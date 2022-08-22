@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stream_demo/stream.dart';
 import 'dart:async';
 import 'dart:math';
+import 'dart:js';
 
 
 void main() {
@@ -60,7 +61,19 @@ class _StreamHomePageState extends State<StreamHomePage> {
         title: Text('Stream'),
       ),
       body: Container(
-        decoration: BoxDecoration(color: bgColor),
+        width: double.infinity,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            Text(
+              lastNumber.toString(),
+            ),
+            ElevatedButton(
+                onPressed: ()=> addRandomNumber(),
+                child: Text('New Random Number'),),
+          ],
+        ),
       ),
     );
   }
@@ -71,5 +84,11 @@ class _StreamHomePageState extends State<StreamHomePage> {
         bgColor = eventColor;
       });
     });
+  }
+
+  void addRandomNumber(){
+    Random random = Random();
+    int myNum = random.nextInt(10);
+    numberStream!.addNumberToSink(myNum);
   }
 }
