@@ -41,35 +41,38 @@ class _StreamHomePageState extends State<StreamHomePage> {
   Color? bgColor;
   ColorStream? colorStream;
   StreamTransformer? transformer;
+  StreamSubscription? subscription;
+  StreamSubscription? subscription2;
+  String values = ' ';
 
 
   @override
   void initState(){
     numberStream = NumberStream();
     numberStreamController = numberStream!.controller;
-    Stream stream = numberStreamController!.stream;
-    transformer = StreamTransformer<int, dynamic>.fromHandlers(
-      handleData: (value, sink){
-        sink.add(value * 10);
-      },
-      handleError: (error, trace, sink){
-        sink.add(-1);
-      },
-      handleDone: (sink) {
-        sink.close();
-      }
-    );
-    stream.transform(transformer!).listen((event) {
+    Stream stream = numberStreamController!.stream.asBroadcastStream();
+    subscription = stream.listen((event) {
       setState(() {
-        lastNumber = event;
+        values += '$event - ';
       });
-    }).onError((error){
+    });
+    subscription2 = stream.listen((event) {
+      setState(() {
+        values += '$event - ';
+      });
+    });
+    subscription!.onError((error){
       setState(() {
         lastNumber = -1;
       });
     });
+
+    subscription!.onDone(() {
+      print('OnDone was called');
+    });
     super.initState();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -84,11 +87,14 @@ class _StreamHomePageState extends State<StreamHomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Text(
-              lastNumber.toString(),
+              values,
             ),
             ElevatedButton(
                 onPressed: ()=> addRandomNumber(),
                 child: Text('New Random Number'),),
+            ElevatedButton(
+                onPressed: ()=> stopStream(),
+                child: Text('Stop Stream')),
           ],
         ),
       ),
@@ -105,8 +111,18 @@ class _StreamHomePageState extends State<StreamHomePage> {
 
   void addRandomNumber(){
     Random random = Random();
-    //int myNum = random.nextInt(10);
-    //numberStream!.addNumberToSink(myNum);
+    int myNum = random.nextInt(10);
+    if (numberStreamController!.isClosed){
+      numberStream!.addNumberToSink(myNum);
+    } else {
+      setState(() {
+        lastNumber = -1;
+      });
+    }
     numberStream!.addError();
+  }
+
+  void stopStream(){
+    numberStreamController!.close();
   }
 }
